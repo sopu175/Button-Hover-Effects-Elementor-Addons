@@ -4,7 +4,7 @@ if (!defined( 'ABSPATH')) {
     exit;
 }
 
-function eihe_addon_failed_load() {
+function button_hover_addon_failed_load() {
 
     $screen = get_current_screen();
     
@@ -22,7 +22,7 @@ function eihe_addon_failed_load() {
 
 		$activation_url = wp_nonce_url('plugins.php?action=activate&plugin=' . $plugin . '&plugin_status=all&paged=1&s', 'activate-plugin_' . $plugin );
 
-		$message = '<p><b>Image Hover Effects Addon</b> requires Elementor to be activated.</p>';
+		$message = '<p><b>Button Hover Effects Elementor Addon</b> requires Elementor to be activated.</p>';
         $message .= '<p><a href="'. $activation_url .'" class="button-primary">Activate Elementor</a></p>';
         
 	} else {
@@ -33,14 +33,14 @@ function eihe_addon_failed_load() {
 
 		$install_url = wp_nonce_url(self_admin_url('update.php?action=install-plugin&plugin=elementor'), 'install-plugin_elementor');
 
-		$message = '<p><b>Image Hover Effects Addon</b> requires Elementor to be installed and activated.</p>';
+		$message = '<p><b>Button Hover Effects Elementor Addon</b> requires Elementor to be installed and activated.</p>';
 		$message .= '<p><a href="'. $install_url .'" class="button-primary">Install Elementor</a></p>';
 	}
 
 	echo '<div class="notice notice-error"><p>' . $message . '</p></div>';
 }
 
-function eihe_addon_failed_outofdate() {
+function button_hover_addon_failed_outofdate() {
 
 	if (!current_user_can('update_plugins')) {
 		return;
@@ -50,7 +50,7 @@ function eihe_addon_failed_outofdate() {
 
     $upgrade_link = wp_nonce_url(self_admin_url('update.php?action=upgrade-plugin&plugin=') . $file_path, 'upgrade-plugin_' . $file_path);
     
-	$message = '<p><b>Image Hover Effects Addon</b> does not work since you are using an older version of Elementor</p>';
+	$message = '<p><b>Button Hover Effects Elementor Addon</b> does not work since you are using an older version of Elementor</p>';
     $message .= '<p><a href="'. $upgrade_link .'" class="button-primary">Update Elementor</a></p>';
     
 	echo '<div class="notice notice-error">' . $message . '</div>';
