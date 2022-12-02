@@ -14,7 +14,7 @@ function button_hover_addon_failed_load() {
 
 	$plugin = 'elementor/elementor.php';
 
-	if (eihe_is_elementor_installed()) {
+	if (button_hover_effect_elementor_installed()) {
 
 		if (!current_user_can('activate_plugins')) {
 			return;
@@ -56,7 +56,7 @@ function button_hover_addon_failed_outofdate() {
 	echo '<div class="notice notice-error">' . $message . '</div>';
 }
 
-function eihe_is_elementor_installed() {
+function button_hover_effect_elementor_installed() {
     $file_path = 'elementor/elementor.php';
     $installed_plugins = get_plugins();
 

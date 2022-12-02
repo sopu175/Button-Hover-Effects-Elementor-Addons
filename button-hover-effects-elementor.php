@@ -15,10 +15,10 @@
  * @wordpress-plugin
  * Plugin Name:       Button Hover Effects Elementor Addons
  * Plugin URI:        https://sopu.live
- * Description:       Add creative button hover effects to Elementor page builder. Easily customize button name and effects with intuitive interface.
+ * Description:       Add creative button hover effects to Elementor page builder. Easily customize button name and effects with typography.
  * Version:           1.0.0
  * Author:            Saif
- * Author URI:        https://sopu.live
+ * Author URI:        https://link.sopu.live
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       button-hover-effects-elementor
@@ -85,7 +85,7 @@ class Button_Hover_Effects_Elementor
     public function wpml_widgets_to_translate_filter($widgets)
     {
         $widgets['e_image_hover_effects'] = [
-            'conditions' => ['widgetType' => 'e_image_hover_effects'],
+            'conditions' => ['widgetType' => 'e_button_hover_effects'],
             'fields' => [
                 [
                     'field' => 'button_hover_title',
@@ -105,8 +105,8 @@ class Button_Hover_Effects_Elementor
 
     public function button_hover_scripts()
     {
-        wp_enqueue_style('button_hover-css', BUTTON_HOVER_URL . 'assets/admin.css', array(), BUTTON_HOVER_VERSION, 'all');
-        wp_enqueue_script('button_hover-common', BUTTON_HOVER_URL . 'assets/admin.js', array('jquery'), BUTTON_HOVER_VERSION, true);
+        wp_enqueue_style('button_hover-css', BUTTON_HOVER_URL . 'assets/css/admin.css', array(), BUTTON_HOVER_VERSION, 'all');
+        wp_enqueue_script('button_hover-common', BUTTON_HOVER_URL . 'assets/js/admin.js', array('jquery'), BUTTON_HOVER_VERSION, true);
     }
 
     public function display_notice()
