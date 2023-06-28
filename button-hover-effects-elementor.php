@@ -26,155 +26,155 @@
  */
 
 
-if (!defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
-define('BUTTON_HOVER_VERSION', '1.0.1');
-define('BUTTON_HOVER_MINIMUM_ELEMENTOR_VERSION', '2.6.0');
-define('BUTTON_HOVER_PATH', plugin_dir_path(__FILE__));
-define('BUTTON_HOVER_URL', plugin_dir_url(__FILE__));
+define( 'BUTTON_HOVER_VERSION', '1.0.1' );
+define( 'BUTTON_HOVER_MINIMUM_ELEMENTOR_VERSION', '2.6.0' );
+define( 'BUTTON_HOVER_PATH', plugin_dir_path( __FILE__ ) );
+define( 'BUTTON_HOVER_URL', plugin_dir_url( __FILE__ ) );
 
 require_once BUTTON_HOVER_PATH . 'includes/elementor-checker.php';
 
 
-class Button_Hover_Effects_Elementor
-{
+class Button_Hover_Effects_Elementor {
 
-    private static $_instance = null;
+	private static $_instance = null;
 
-    public static function get_instance()
-    {
-        if (is_null(self::$_instance)) {
-            self::$_instance = new self();
-        }
-        return self::$_instance;
-    }
+	public static function get_instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
 
-    public function __construct()
-    {
-        add_action('plugins_loaded', [$this, 'init']);
-    }
+		return self::$_instance;
+	}
 
-    public function init()
-    {
+	public function __construct() {
+		add_action( 'plugins_loaded', [ $this, 'init' ] );
+	}
 
-        if (!did_action('elementor/loaded')) {
-            add_action('admin_notices', 'button_hover_addon_failed_load');
-            return;
-        }
+	public function init() {
 
-        if (!version_compare(ELEMENTOR_VERSION, BUTTON_HOVER_MINIMUM_ELEMENTOR_VERSION, '>=')) {
-            add_action('admin_notices', [$this, 'button_hover_addon_failed_outofdate']);
-            return;
-        }
+		if ( ! did_action( 'elementor/loaded' ) ) {
+			add_action( 'admin_notices', 'button_hover_addon_failed_load' );
 
-        add_action('elementor/frontend/after_enqueue_styles', [$this, 'includes']);
-        add_action('elementor/widgets/widgets_registered', [$this, 'register_widgets']);
-        add_action('upgrader_process_complete', [$this, 'wp_upe_upgrade_completed'], 10, 2);
-        add_action('admin_enqueue_scripts', [$this, 'button_hover_scripts']);
-        add_action('elementor/editor/before_enqueue_scripts', function () {
-            wp_register_style('button_hover-editor-css', BUTTON_HOVER_URL . 'assets/admin.css');
-            wp_enqueue_style('button_hover-editor-css');
-        });
-        add_action('admin_init', [$this, 'display_notice']);
-        load_plugin_textdomain('button_hover-lang', false, dirname(plugin_basename(__FILE__)) . '/languages');
-        add_filter('wpml_elementor_widgets_to_translate', [$this, 'wpml_widgets_to_translate_filter']);
-    }
+			return;
+		}
 
-    public function wpml_widgets_to_translate_filter($widgets)
-    {
-        $widgets['e_image_hover_effects'] = [
-            'conditions' => ['widgetType' => 'e_button_hover_effects'],
-            'fields' => [
-                [
-                    'field' => 'button_hover_title',
-                    'type' => __('Image Hover Effects : Title', 'button_hover-lang'),
-                    'editor_type' => 'LINE'
-                ],
-                [
-                    'field' => 'button_hover_description',
-                    'type' => __('Image Hover Effects : Description', 'button_hover-lang'),
-                    'editor_type' => 'LINE'
-                ],
-            ],
-        ];
+		if ( ! version_compare( ELEMENTOR_VERSION, BUTTON_HOVER_MINIMUM_ELEMENTOR_VERSION, '>=' ) ) {
+			add_action( 'admin_notices', [ $this, 'button_hover_addon_failed_outofdate' ] );
 
-        return $widgets;
-    }
+			return;
+		}
 
-    public function button_hover_scripts()
-    {
-        wp_enqueue_style('button_hover-css', BUTTON_HOVER_URL . 'assets/css/admin.css', array(), BUTTON_HOVER_VERSION, 'all');
-        wp_enqueue_script('button_hover-common', BUTTON_HOVER_URL . 'assets/js/admin.js', array('jquery'), BUTTON_HOVER_VERSION, true);
-    }
+		add_action( 'elementor/frontend/after_enqueue_styles', [ $this, 'includes' ] );
+		add_action( 'elementor/widgets/widgets_registered', [ $this, 'register_widgets' ] );
+		add_action( 'upgrader_process_complete', [ $this, 'wp_upe_upgrade_completed' ], 10, 2 );
+		add_action( 'admin_enqueue_scripts', [ $this, 'button_hover_scripts' ] );
+		add_action( 'elementor/editor/before_enqueue_scripts', function () {
+			wp_register_style( 'button_hover-editor-css', BUTTON_HOVER_URL . 'assets/admin.css' );
+			wp_enqueue_style( 'button_hover-editor-css' );
+		} );
+		add_action( 'admin_init', [ $this, 'display_notice' ] );
+		load_plugin_textdomain( 'button_hover-lang', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+		add_filter( 'wpml_elementor_widgets_to_translate', [ $this, 'wpml_widgets_to_translate_filter' ] );
+	}
 
-    public function display_notice()
-    {
+	public function wpml_widgets_to_translate_filter( $widgets ) {
+		$widgets['e_image_hover_effects'] = [
+			'conditions' => [ 'widgetType' => 'e_button_hover_effects' ],
+			'fields'     => [
+				[
+					'field'       => 'button_hover_title',
+					'type'        => __( 'Image Hover Effects : Title', 'button_hover-lang' ),
+					'editor_type' => 'LINE'
+				],
+				[
+					'field'       => 'button_hover_description',
+					'type'        => __( 'Image Hover Effects : Description', 'button_hover-lang' ),
+					'editor_type' => 'LINE'
+				],
+			],
+		];
 
-        if (isset($_GET['button_hover_dismiss']) && $_GET['button_hover_dismiss'] == 1) {
-            add_option('button_hover_dismiss', true);
-        }
+		return $widgets;
+	}
 
-        $upgrade = get_option('button_hover_upgraded');
-        $dismiss = get_option('button_hover_dismiss');
+	public function button_hover_scripts() {
+		wp_enqueue_style( 'button_hover-css', BUTTON_HOVER_URL . 'assets/css/admin.css', array(), BUTTON_HOVER_VERSION, 'all' );
+		wp_enqueue_script( 'button_hover-common', BUTTON_HOVER_URL . 'assets/js/admin.js', array( 'jquery' ), BUTTON_HOVER_VERSION, true );
+	}
 
-        if (!get_option('button_hover-top-notice')) {
-            add_option('button_hover-top-notice', strtotime(current_time('mysql')));
-        }
-        if (get_option('button_hover-top-notice') && get_option('button_hover-top-notice') != 0) {
-            if (get_option('button_hover-top-notice') < strtotime('-3 days')) { //if greater than 3 days
-                add_action('admin_notices', array($this, 'button_hover_top_admin_notice'));
-                add_action('wp_ajax_button_hover_top_notice', array($this, 'button_hover_top_notice_dismiss'));
-            }
-        }
-    }
+	public function display_notice() {
 
-    public function button_hover_top_notice_dismiss()
-    {
-        update_option('button_hover-top-notice', '0');
-        exit();
-    }
+		if ( isset( $_GET['button_hover_dismiss'] ) && $_GET['button_hover_dismiss'] == 1 ) {
+			add_option( 'button_hover_dismiss', true );
+		}
 
-    public function button_hover_top_admin_notice()
-    {
-        ?>
+		$upgrade = get_option( 'button_hover_upgraded' );
+		$dismiss = get_option( 'button_hover_dismiss' );
+
+		if ( ! get_option( 'button_hover-top-notice' ) ) {
+			add_option( 'button_hover-top-notice', strtotime( current_time( 'mysql' ) ) );
+		}
+		if ( get_option( 'button_hover-top-notice' ) && get_option( 'button_hover-top-notice' ) != 0 ) {
+			if ( get_option( 'button_hover-top-notice' ) < strtotime( '-3 days' ) ) { //if greater than 3 days
+				add_action( 'admin_notices', array( $this, 'button_hover_top_admin_notice' ) );
+				add_action( 'wp_ajax_button_hover_top_notice', array( $this, 'button_hover_top_notice_dismiss' ) );
+			}
+		}
+	}
+
+	public function button_hover_top_notice_dismiss() {
+		update_option( 'button_hover-top-notice', '0' );
+		exit();
+	}
+
+	/**
+	 * Display a notice to rate the plugin and provide an upgrade option.
+	 */
+	public function button_hover_top_admin_notice() {
+		?>
         <div class="button_hover-notice notice notice-success is-dismissible">
-            <img class="button_hover-iconimg" src="<?php echo BUTTON_HOVER_URL; ?>assets/icon.png" style="float:left;"/>
-            <p style="width:80%;"><?php _e('Enjoying our <strong>Button Hover Effects - Elementor Addon?</strong> We hope you liked it! If you feel this plugin helped you, You can give us a 5 star rating!<br>It will motivate us to serve you more !', 'button_hover-lang'); ?> </p>
+            <img class="button_hover-iconimg" src="<?php echo esc_url( BUTTON_HOVER_URL . 'assets/icon.png' ); ?>"
+                 style="float:left;"/>
+            <p style="width:80%;"><?php _e( 'Enjoying our <strong>Button Hover Effects - Elementor Addon?</strong> We hope you liked it! If you feel this plugin helped you, You can give us a 5-star rating!<br>It will motivate us to serve you more!', 'button_hover-lang' ); ?> </p>
             <a href="https://sopu.live" class="button button-primary" style="margin-right: 10px !important;"
-               target="_blank"><?php _e('Rate the Plugin!', 'button_hover-lang'); ?> &#11088;&#11088;&#11088;&#11088;&#11088;</a>
+               target="_blank"><?php _e( 'Rate the Plugin!', 'button_hover-lang' ); ?> &#11088;&#11088;&#11088;&#11088;&#11088;</a>
             <a href="https://sopu.live" class="button button-secondary"
-               target="_blank"><?php _e('Go Pro', 'button_hover-lang'); ?></a>
-            <span class="button_hover-done"><?php _e('Already Done', 'button_hover-lang'); ?></span>
+               target="_blank"><?php _e( 'Go Pro', 'button_hover-lang' ); ?></a>
+            <span class="button_hover-done"><?php _e( 'Already Done', 'button_hover-lang' ); ?></span>
         </div>
-        <?php
-    }
+		<?php
+	}
 
-    public function wp_upe_upgrade_completed($upgrader_object, $options)
-    {
+	/**
+	 * Perform actions after a plugin upgrade is completed.
+	 *
+	 * @param object $upgrader_object The Upgrader object.
+	 * @param array $options The upgrade options.
+	 */
+	public function wp_upe_upgrade_completed( $upgrader_object, $options ) {
+		$our_plugin = plugin_basename( __FILE__ );
 
-        $our_plugin = plugin_basename(__FILE__);
+		if ( $options['action'] == 'update' && $options['type'] == 'plugin' && isset( $options['plugins'] ) ) {
+			foreach ( $options['plugins'] as $plugin ) {
+				if ( $plugin == $our_plugin ) {
+					add_option( 'button_hover_upgraded', true );
+				}
+			}
+		}
+	}
 
-        if ($options['action'] == 'update' && $options['type'] == 'plugin' && isset($options['plugins'])) {
-            foreach ($options['plugins'] as $plugin) {
-                if ($plugin == $our_plugin) {
-                    add_option('button_hover_upgraded', true);
-                }
-            }
-        }
 
-    }
+	public function register_widgets() {
+		require_once( BUTTON_HOVER_PATH . 'includes/widgets.php' );
+	}
 
-    public function register_widgets()
-    {
-        require_once(BUTTON_HOVER_PATH . 'includes/widgets.php');
-    }
-
-    public function includes()
-    {
-        wp_enqueue_style('button_hover-front-style', BUTTON_HOVER_URL . 'assets/css/style.css', array(), BUTTON_HOVER_VERSION);
-    }
+	public function includes() {
+		wp_enqueue_style( 'button_hover-front-style', BUTTON_HOVER_URL . 'assets/css/style.css', array(), BUTTON_HOVER_VERSION );
+	}
 
 }
 
